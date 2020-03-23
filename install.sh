@@ -292,10 +292,39 @@ modify_nginx_other() {
 }
 web_camouflage() {
     ##请注意 这里和LNMP脚本的默认路径冲突，千万不要在安装了LNMP的环境下使用本脚本，否则后果自负
-    rm -rf /home/wwwroot
-    mkdir -p /home/wwwroot
-    cd /home/wwwroot || exit
-    git clone https://github.com/wulabing/3DCEList.git
+	sed -i 's/3DCEList/website/g' ${nginx_conf}
+    re='^[0-9]+$'
+    rm -rf /home/wwwroot && mkdir -p /home/wwwroot/website && cd /home/wwwroot
+    echo "请选择站点伪装（default:1）:"
+    echo "1: https://github.com/tzpBingo/safario.git"
+    echo "2: https://github.com/tzpBingo/visualize.git"
+    echo "3: https://github.com/tzpBingo/cohost.git"
+    echo "4: https://github.com/tzpBingo/roadtrip.git"
+	echo "5: https://github.com/tzpBingo/CkinVideoPlayer.git"
+    read -p  "请输入：" webcamouflage
+
+    if ! [[ $webcamouflage =~ $re ]] ; then
+        echo "git clone https://github.com/tzpBingo/safario.git website"
+        git clone https://github.com/tzpBingo/safario.git website
+    elif (( webcamouflage == 1 )) ; then
+        echo "git clone https://github.com/tzpBingo/safario.git  website"
+        git clone https://github.com/tzpBingo/safario.git  website
+    elif (( webcamouflage == 2 )) ; then
+        echo "git clone https://github.com/tzpBingo/visualize.git  website"
+        git clone https://github.com/tzpBingo/visualize.git  website
+    elif (( webcamouflage == 3 )) ; then
+        echo "git clone https://github.com/tzpBingo/cohost.git  website"
+        git clone https://github.com/tzpBingo/cohost.git  website
+    elif (( webcamouflage == 4 )) ; then
+        echo "git clone https://github.com/tzpBingo/roadtrip.git  website"
+        git clone https://github.com/tzpBingo/roadtrip.git  website
+	elif (( webcamouflage == 5 )) ; then
+        echo "git clone https://github.com/tzpBingo/CkinVideoPlayer.git  website"
+        git clone https://github.com/tzpBingo/CkinVideoPlayer.git  website
+    else
+        echo "git clone https://github.com/tzpBingo/safario.git  website"
+        git clone https://github.com/tzpBingo/safario.git  website
+    fi
     judge "web 站点伪装"
 }
 v2ray_install() {
@@ -528,7 +557,7 @@ nginx_conf_add() {
         ssl_ciphers           TLS13-AES-256-GCM-SHA384:TLS13-CHACHA20-POLY1305-SHA256:TLS13-AES-128-GCM-SHA256:TLS13-AES-128-CCM-8-SHA256:TLS13-AES-128-CCM-SHA256:EECDH+CHACHA20:EECDH+CHACHA20-draft:EECDH+ECDSA+AES128:EECDH+aRSA+AES128:RSA+AES128:EECDH+ECDSA+AES256:EECDH+aRSA+AES256:RSA+AES256:EECDH+ECDSA+3DES:EECDH+aRSA+3DES:RSA+3DES:!MD5;
         server_name           serveraddr.com;
         index index.html index.htm;
-        root  /home/wwwroot/3DCEList;
+        root  /home/wwwroot/website;
         error_page 400 = /400.html;
         location /ray/
         {
@@ -930,7 +959,8 @@ menu() {
     echo -e "${Green}14.${Font} 卸载 V2Ray"
     echo -e "${Green}15.${Font} 更新 证书crontab计划任务"
     echo -e "${Green}16.${Font} 清空 证书遗留文件"
-    echo -e "${Green}17.${Font} 退出 \n"
+    echo -e "${Green}17.${Font} 更改 模板"
+	echo -e "${Green}18.${Font} 退出 \n"
 
     read -rp "请输入数字：" menu_num
     case $menu_num in
@@ -1001,7 +1031,10 @@ menu() {
     16)
         delete_tls_key_and_crt
         ;;
-    17)
+	17)
+        web_camouflage
+        ;;
+    18)
         exit 0
         ;;
     *)
